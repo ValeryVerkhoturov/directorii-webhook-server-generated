@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  title: Directorii Webhook API
+  description: |-
+    API for receiving webhooks related to a contractor.
+
+    To effectively use the API for receiving webhooks, follow these steps:
+
+    1. **Generate a Program Template**:
+       - Visit the Swagger Editor at [Swagger Editor](https://editor.swagger.io/).
+       - Use the "Generate Server" button to create a template that suits your needs.
+
+    2. **Customize Your Webhook Path** (optional):
+       - In the generated template, locate the route designated as `/lead-created-or-updated`.
+       - Replace this placeholder path with your specific webhook URL that will handle incoming requests.
+
+    3. **Set up on Directorii Webhook Page**:
+       - Once you have your customized webhook path, navigate to the Directorii Webhook page.
+       - Configure your webhook path according to the protocol, domain name and path of your application.
+
+    By following these steps, you can ensure that your API is properly set up to receive notifications.
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /lead-created-or-updated:
+    post:
+      summary: Lead created / updated Webhook
+      operationId: leadCreatedOrUpdated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractorWebhookPayload'
+        required: true
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Invalid request
+components:
+  schemas:
+    ContractorWebhookPayload:
+      type: object
+      properties:
+        Timestamp:
+          type: integer
+          description: The timestamp of the webhook event.
+          format: int64
+          example: 1730003119
+        Action:
+          type: string
+          description: The action that triggered the webhook.
+          example: Created
+        Data:
+          $ref: '#/components/schemas/ContractorWebhookData'
+    ContractorWebhookData:
+      type: object
+      properties:
+        LeadInfo:
+          $ref: '#/components/schemas/ContractorWebhookLeadInfo'
+        Documents:
+          $ref: '#/components/schemas/ContractorWebhookDocuments'
+        Commission:
+          $ref: '#/components/schemas/ContractorWebhookCommission'
+        CustomerFeedback:
+          $ref: '#/components/schemas/ContractorWebhookCustomerFeedback'
+        Offer:
+          $ref: '#/components/schemas/ContractorWebhookOffer'
+        RejectReason:
+          $ref: '#/components/schemas/ContractorWebhookRejectReason'
+    ContractorWebhookLeadInfo:
+      type: object
+      properties:
+        Id:
+          type: integer
+          description: Unique identifier for the lead.
+          format: uint32
+          example: 2367
+        Status:
+          type: integer
+          description: Status code of the lead.
+          format: uint32
+          example: 1
+        StatusName:
+          type: string
+          description: Human-readable status name of the lead.
+          example: New Request
+        Created:
+          type: string
+          description: Creation timestamp of the lead.
+          format: date-time
+          example: 2024-10-27T04:25:19.94397184Z
+        Source:
+          type: string
+          description: |
+            This endpoint allows users to submit leads through various sources, including website submissions, manual entries by contractors, and voucher-based leads. Each lead source is categorized for better tracking and analysis.
+          example: Manual
+          enum:
+          - Website
+          - Manual
+          - Voucher
+        FirstName:
+          type: string
+          description: First name of the lead.
+          example: John
+        LastName:
+          type: string
+          description: Last name of the lead.
+          example: Brown
+        Service:
+          type: string
+          description: Service requested by the lead.
+          example: Roofing
+        Address:
+          type: string
+          description: Address of the lead.
+          example: Test Address
+        City:
+          type: string
+          description: City of the lead.
+          example: "New York, NY"
+        ZipCode:
+          type: string
+          description: Zip code of the lead's address.
+          example: "10001"
+        Phone:
+          type: string
+          description: Phone number of the lead.
+          example: +1 (267) 380-0000
+        Email:
+          type: string
+          description: Email address of the lead.
+          format: email
+          example: test@directorii.com
+        Description:
+          type: string
+          description: Additional information about the lead.
+          example: ""
+    ContractorWebhookDocuments:
+      type: object
+      properties:
+        Contract:
+          type: string
+          description: Link or identifier for the contract document.
+          nullable: true
+          example: https://contractors.directorii.com/api/v1/attachment/download/dc860d0d-2f19-4dc2-b62d-5c4624a1c813
+        Receipt:
+          type: string
+          description: Link or identifier for the receipt document.
+          nullable: true
+          example: https://contractors.directorii.com/api/v1/attachment/download/dc860d0d-2f19-4dc2-b62d-5c4624a1c813
+        Guarantee:
+          type: string
+          description: Link or identifier for the guarantee document.
+          nullable: true
+          example: https://contractors.directorii.com/api/v1/attachment/download/dc860d0d-2f19-4dc2-b62d-5c4624a1c813
+    ContractorWebhookCommission:
+      type: object
+      properties:
+        ProjectAmount:
+          type: number
+          description: Total amount of the project.
+          format: float64
+          nullable: true
+          example: 40
+        FeePercent:
+          type: number
+          description: Percentage fee applied to the project amount.
+          format: float64
+          nullable: true
+          example: 1.5
+        Fee:
+          type: number
+          description: Total fee charged for the project.
+          format: float64
+          nullable: true
+          example: 0.6
+        Payment:
+          type: string
+          description: Payment method used.
+          nullable: true
+          example: Succeeded
+          enum:
+          - Failed
+          - Succeeded
+          - Processing
+          - Canceled
+          - Unknown
+    ContractorWebhookCustomerFeedback:
+      type: object
+      properties:
+        Date:
+          type: string
+          description: Date when feedback was given.
+          format: date-time
+          example: 2024-10-27T04:25:19.94397184Z
+        Rate:
+          type: integer
+          description: Rating given by customer (1-5).
+          format: int32
+          example: 5
+        Feedback:
+          type: string
+          description: Customer's feedback comments.
+          example: Test feedback
+    ContractorWebhookOffer:
+      type: object
+      properties:
+        Id:
+          type: integer
+          description: Unique identifier for the offer.
+          format: uint32
+          example: 5
+        Name:
+          type: string
+          description: Name of the offer.
+          example: Roof Inspection
+        Price:
+          type: integer
+          description: Price of the offer.
+          format: uint32
+          example: 100
+    ContractorWebhookRejectReason:
+      type: object
+      properties:
+        Id:
+          type: integer
+          description: Unique identifier for reject reason.
+          format: uint32
+          example: 1
+        Name:
+          type: string
+          description: Description of reject reason.
+          example: Didn’t reach out
+          enum:
+          - Didn’t reach out
+          - Couldn’t reach contact
+          - Pricing
+          - Requested by mistake
+          - Outside service area
+          - Went with someone else
+          - Spam
